@@ -6,11 +6,11 @@ import AppMenuItem from './AppMenuItem.vue';
 const model = ref([
     {
         label: 'Gestão de Avisos',
-        items: [{ label: 'Avisos', icon: 'pi pi-fw pi-home', to: '/avisos' }]
+        items: [{ label: 'Avisos', icon: 'pi pi-fw pi-volume-up', to: '/avisos' }]
     },
     {
-        label: 'Gestão de Pessoas',
-        items: [{ label: 'Pessoas', icon: 'pi pi-fw pi-home', to: '/avisos' }]
+        label: 'Gestão de Colaboradores',
+        items: [{ label: 'Colaboradores', icon: 'pi pi-fw pi-user', to: '/colaboradores' }]
     }
 ]);
 </script>

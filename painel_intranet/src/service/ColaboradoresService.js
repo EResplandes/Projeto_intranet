@@ -2,9 +2,27 @@ const token = localStorage.getItem('token');
 
 import API_URL from './Config.js';
 
-export default class AvisosService {
-    async buscaAvisos() {
-        return await fetch(`${API_URL}/avisos/`, {
+export default class ColaboradoresService {
+    async buscaTodosColaboradores() {
+        return await fetch(`${API_URL}/colaboradores/`, {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + token
+            }
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    async buscaDepartamentos() {
+        return await fetch(`${API_URL}/colaboradores/departamentos`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -22,7 +40,7 @@ export default class AvisosService {
     }
 
     async buscaIndicadores() {
-        return await fetch(`${API_URL}/avisos/indicadores`, {
+        return await fetch(`${API_URL}/colaboradores/indicadores`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -39,8 +57,30 @@ export default class AvisosService {
             });
     }
 
-    async deletarAviso(id) {
-        return await fetch(`${API_URL}/avisos/${id}`, {
+    async cadastrarDepartamento(departamento) {
+        return await fetch(`${API_URL}/colaboradores/cadastrar-departamento`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                departamento: departamento
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    async deletarColaborador(id) {
+        return await fetch(`${API_URL}/colaboradores/${id}`, {
             method: 'DELETE',
             headers: {
                 Accept: 'application/json',
@@ -57,8 +97,8 @@ export default class AvisosService {
             });
     }
 
-    async alteraStatusAviso(id) {
-        return await fetch(`${API_URL}/avisos/alterar-status/${id}`, {
+    async alterarStatusColaborador(id) {
+        return await fetch(`${API_URL}/colaboradores/alterar-status/${id}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -74,18 +114,20 @@ export default class AvisosService {
                 throw error;
             });
     }
+    async cadastraColaborador(colaborador) {
+        const formData = new FormData();
+        formData.append('nome', colaborador?.nome ?? null);
+        formData.append('cpf', colaborador?.cpf ?? null);
+        formData.append('email', colaborador?.email ?? null);
+        formData.append('departamento_id', colaborador?.departamento.id ?? null);
+        formData.append('dt_admissao', this.formatarData(colaborador?.dt_admissao) ?? null);
+        formData.append('dt_nascimento', this.formatarData(colaborador?.dt_nascimento) ?? null);
+        formData.append('cargo', colaborador?.cargo ?? null);
+        formData.append('imagem', colaborador?.imagem ?? null);
 
-    async cadastrarCategoria(novaCategoria) {
-        return await fetch(`${API_URL}/avisos/cadastrar-categoria`, {
+        return fetch(`${API_URL}/colaboradores/cadastrar`, {
             method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token
-            },
-            body: JSON.stringify({
-                categoria: novaCategoria
-            })
+            body: formData
         })
             .then((res) => res.json())
             .then((d) => {
@@ -97,69 +139,13 @@ export default class AvisosService {
             });
     }
 
-    async buscaCategorias() {
-        return await fetch(`${API_URL}/avisos/busca-categorais`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer ' + token
-            }
-        })
-            .then((res) => res.json())
-            .then((d) => {
-                return d;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                throw error;
-            });
-    }
+    formatarData(data) {
+        if (!(data instanceof Date)) return '';
 
-    async cadastrarAviso(aviso) {
-        return await fetch(`${API_URL}/avisos/cadastrar-aviso`, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token
-            },
-            body: JSON.stringify({
-                titulo: aviso.titulo,
-                categoria_id: aviso.categoria.id,
-                texto: aviso.texto
-            })
-        })
-            .then((res) => res.json())
-            .then((d) => {
-                return d;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                throw error;
-            });
-    }
+        const ano = data.getFullYear();
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const dia = String(data.getDate()).padStart(2, '0');
 
-    async editaAviso(aviso) {
-        return await fetch(`${API_URL}/avisos/editar/${aviso.id}`, {
-            method: 'PUT',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token
-            },
-            body: JSON.stringify({
-                titulo: aviso.titulo,
-                categoria_id: aviso.categoria.id,
-                texto: aviso.texto
-            })
-        })
-            .then((res) => res.json())
-            .then((d) => {
-                return d;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                throw error;
-            });
+        return `${ano}-${mes}-${dia}`;
     }
 }
