@@ -13,7 +13,7 @@ class AvisosService
     {
         try {
 
-            $avisos = AvisosResource::collection(Avisos::all());
+            $avisos = AvisosResource::collection(Avisos::orderBy('created_at', 'desc')->get());
 
             return [
                 'status' => 'sucesso',
@@ -38,7 +38,7 @@ class AvisosService
 
         try {
 
-            $categoria = Avisos::create([
+            $categoria = CategoriasAvisos::create([
                 'categoria' => $request->categoria,
             ]);
 
@@ -92,7 +92,7 @@ class AvisosService
             $aviso->delete();
 
             $avisos = AvisosResource::collection(
-                Avisos::all()
+                Avisos::orderBy('created_at', 'desc')->get()
             );
 
             DB::commit();
@@ -148,13 +148,12 @@ class AvisosService
             $aviso = Avisos::create([
                 'categoria_id' => $request->categoria_id,
                 'titulo' => $request->titulo,
-                'usuario_id' => $request->usuario_id,
                 'texto' => $request->texto,
                 'ativo' => true,
             ]);
 
             $avisos = AvisosResource::collection(
-                Avisos::all()
+                Avisos::orderBy('created_at', 'desc')->get()
             );
 
             DB::commit();
@@ -186,6 +185,39 @@ class AvisosService
                 'http_code' => 200
             ];
         } catch (\Exception $e) {
+            throw $e;
+            return [
+                'status' => 'erro',
+                'erro' => $e,
+                'http_code' => 500
+            ];
+        }
+    }
+
+    public function editaAviso($request, $id)
+    {
+        DB::beginTransaction();
+
+        try {
+            $aviso = Avisos::find($id);
+            $aviso->categoria_id = $request->categoria_id;
+            $aviso->titulo = $request->titulo;
+            $aviso->texto = $request->texto;
+            $aviso->save();
+
+            $avisos = AvisosResource::collection(
+                Avisos::orderBy('created_at', 'desc')->get()
+            );
+
+            DB::commit();
+
+            return [
+                'status' => 'sucesso',
+                'http_code' => 200,
+                'avisos' => $avisos
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
             throw $e;
             return [
                 'status' => 'erro',

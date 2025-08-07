@@ -30,7 +30,7 @@ class AvisosController extends Controller
         ], $query['http_code']);
     }
 
-    public function cadastraCategoriaAviso(CadastroCategoriaAvisosRequest $request)
+    public function cadastraCategoriaAviso(Request $request)
     {
         $query = $this->avisosService->cadastraCategoriaAviso($request);
 
@@ -95,4 +95,14 @@ class AvisosController extends Controller
         ], $query['http_code']);
     }
 
+    public function editaAviso(Request $request, $id)
+    {
+        $query = $this->avisosService->editaAviso($request, $id);
+
+        return response()->json([
+            'status' => $query['status'],
+            'avisos' => $query['avisos'] ?? null,
+            'erro' => $query['erro'] ?? null
+        ], $query['http_code']);
+    }
 }

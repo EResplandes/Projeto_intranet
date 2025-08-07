@@ -25,7 +25,6 @@ class CadastrarAvisoRequest extends FormRequest
             'titulo' => 'required',
             'texto' => 'required',
             'categoria_id' => 'required',
-            'usuario_id' => 'required',
         ];
     }
 
@@ -35,7 +34,6 @@ class CadastrarAvisoRequest extends FormRequest
             'titulo.required' => 'O campo título é obrigatório.',
             'texto.required' => 'O campo texto é obrigatório.',
             'categoria_id.required' => 'O campo categoria é obrigatório.',
-            'usuario_id.required' => 'O campo usuário é obrigatório.',
         ];
     }
 }
