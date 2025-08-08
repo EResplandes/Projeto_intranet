@@ -148,4 +148,31 @@ export default class ColaboradoresService {
 
         return `${ano}-${mes}-${dia}`;
     }
+
+    async editaColaborador(colaborador) {
+        return fetch(`${API_URL}/colaboradores/editar/${colaborador?.id}`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: colaborador?.nome ?? null,
+                cpf: colaborador?.cpf ?? null,
+                email: colaborador?.email ?? null,
+                departamento_id: colaborador?.departamento.id ?? null,
+                dt_admissao: colaborador?.dt_admissao ?? null,
+                dt_nascimento: colaborador?.dt_nascimento ?? null,
+                cargo: colaborador?.cargo ?? null
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
 }

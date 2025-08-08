@@ -13,9 +13,6 @@ export default {
             colaboradorSelecionadoId: null,
             novoDepartamento: null,
             botaoEditar: false,
-            filters: {
-                global: null
-            },
             modalDeletarColaborador: false,
             submitted: false,
             carregandoIndicadores: true,
@@ -53,23 +50,9 @@ export default {
             this.modalCadastroColaborador = true;
             this.botaoEditar = false;
         },
-        abrirModalCadastarAviso() {
-            this.modalA;
-        },
         buscadepartamentos() {
             this.avisosService.buscadepartamentos().then((data) => {
                 this.departamentos = data.departamentos;
-            });
-        },
-        buscaAvisos() {
-            // Buscando todos os avisos cadastrados no sistema
-            this.avisosService.buscaAvisos().then((data) => {
-                this.avisos = data.avisos;
-            });
-
-            // Busca todos indicadores da página
-            this.avisosService.buscaIndicadores().then((data) => {
-                this.indicadores = data.indicadores;
             });
         },
         editaColaborador(colaborador) {
@@ -78,7 +61,7 @@ export default {
             this.botaoEditar = true;
         },
         salvaColaborador() {
-            this.colaboradorSelecionadoId.editaColaborador(this.colaborador, this.colaborador.id).then((data) => {
+            this.colaboradoresService.editaColaborador(this.colaborador).then((data) => {
                 if (data.status) {
                     this.mostraMensagemSucesso('Colaborador editado com sucesso!');
                     this.colaborador = {};
@@ -141,10 +124,6 @@ export default {
             const date = new Date(dateString);
             return date.toLocaleDateString('pt-BR');
         },
-        stripHtml(html) {
-            if (!html) return '';
-            return html.replace(/<[^>]*>/g, '');
-        },
         mostraMensagemSucesso(mensagem) {
             this.$toast.add({ severity: 'Mensagem do Sistema', summary: 'Info', detail: mensagem, life: 3000 });
         },
@@ -205,7 +184,7 @@ export default {
 
         <Divider />
 
-        <!-- Tabela de Avisos -->
+        <!-- Tabela de Colaboradores -->
         <Card>
             <template #title>Lista de Colaboradores</template>
             <template #subtitle>Gerencie seus colaboradores</template>
@@ -222,12 +201,17 @@ export default {
                     </template>
 
                     <template>
+                        <!-- <Column field="imagem" header="Imagem do Colaboador" :sortable="true" ">
+                            <template #body="{ data }"> <Image :src="'http://localhost:8000/storage/' + data.imagem" alt="Imagem" width="100" height="100" class="shadow rounded-full borda-redonda" /> </template>
+                        </Column> -->
+
                         <Column field="nome" header="Nome Completo" :sortable="true"></Column>
+                        <Column field="cargo" header="Cargo" :sortable="true"></Column>
                         <Column field="email" header="Email" :sortable="true"></Column>
-                        <Column field="cpf" header="CPF" :sortable="true"></Column>
+                        <!-- <Column field="cpf" header="CPF" :sortable="true"></Column> -->
                         <Column header="Departamento" :sortable="true">
                             <template #body="{ data }">
-                                <div class="truncate-text" style="max-width: 300px">
+                                <div class="truncate-text">
                                     {{ data.departamento?.departamento }}
                                 </div>
                             </template>
@@ -263,6 +247,12 @@ export default {
             class="rounded-xl"
         >
             <form @submit.prevent="salvarColaborador" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div v-if="botaoEditar" class="flex items-center justify-center">
+                    <div class="w-28 h-28 rounded-full border-4 border-blue-500 shadow-lg overflow-hidden">
+                        <img :src="'http://localhost:8000/storage/' + colaborador.imagem" alt="Imagem" class="w-full h-full object-cover" />
+                    </div>
+                </div>
+
                 <!-- Nome completo -->
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-600 mb-1">Nome completo</label>

@@ -11,6 +11,10 @@ const model = ref([
     {
         label: 'Gestão de Colaboradores',
         items: [{ label: 'Colaboradores', icon: 'pi pi-fw pi-user', to: '/colaboradores' }]
+    },
+    {
+        label: 'Gestão de FAQ',
+        items: [{ label: 'Perguntas', icon: 'pi pi-fw pi-user', to: '/faq' }]
     }
 ]);
 </script>
