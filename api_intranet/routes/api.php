@@ -31,7 +31,7 @@ Route::prefix('painel')->group(function () {
         Route::get('/alterar-status/{id}', [ColaboradoresController::class, 'alteraStatusColaborador']);
         Route::delete('/{id}', [ColaboradoresController::class, 'deletaColaborador']);
         Route::get('/indicadores', [ColaboradoresController::class, 'buscaIndicadores']);
-        Route::put('/editar/{id}', [ColaboradoresController::class, 'editaColaborador']);
+        Route::post('/editar/{id}', [ColaboradoresController::class, 'editaColaborador']);
         Route::get('/indicadores', [ColaboradoresController::class, 'buscaIndicadores']);
     });
 });

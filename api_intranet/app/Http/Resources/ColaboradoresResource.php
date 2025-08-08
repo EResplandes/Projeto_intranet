@@ -18,9 +18,8 @@ class ColaboradoresResource extends JsonResource
         return [
             'id' => $this->id,
             'nome' => $this->name,
-            'sobrenome' => $this->sobrenome,
             'cpf' => $this->cpf,
-            'cartao' => $this->cartao,
+            'cargo' => $this->cargo,
             'imagem' => $this->imagem,
             'dt_nascimento' => $this->formataData($this->dt_nascimento),
             'dt_admissao' => $this->formataData($this->dt_admissao),
