@@ -231,9 +231,9 @@ export default {
                         </Column>
                         <Column header="Ações" style="width: 150px">
                             <template #body="{ data }">
-                                <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-success mr-2" @click="editaAviso(data)" v-tooltip.top="'Editar'" />
-                                <Button :icon="data.ativo ? 'pi pi-eye-slash' : 'pi pi-eye'" class="p-button-rounded p-button-text p-button-warning mr-2" @click="alterarStatus(data)" v-tooltip.top="data.ativo ? 'Desativar' : 'Ativar'" />
-                                <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger" @click="confirmacaoExclusao(data)" v-tooltip.top="'Excluir'" />
+                                <Button icon="pi pi-pencil" class="p-button-success mr-2" @click="editaAviso(data)" v-tooltip.top="'Editar'" />
+                                <Button :icon="data.ativo ? 'pi pi-eye-slash' : 'pi pi-eye'" class="p-button-info mr-2" @click="alterarStatus(data)" v-tooltip.top="data.ativo ? 'Desativar' : 'Ativar'" />
+                                <Button icon="pi pi-trash" class="p-button-danger" @click="confirmacaoExclusao(data)" v-tooltip.top="'Excluir'" />
                             </template>
                         </Column>
                     </template>

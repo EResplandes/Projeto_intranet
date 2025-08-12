@@ -2,9 +2,9 @@ const token = localStorage.getItem('token');
 
 import API_URL from './Config.js';
 
-export default class AvisosService {
-    async buscaAvisos() {
-        return await fetch(`${API_URL}/avisos/`, {
+export default class FaqService {
+    async buscaFaqs() {
+        return await fetch(`${API_URL}/faq/`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -22,7 +22,7 @@ export default class AvisosService {
     }
 
     async buscaIndicadores() {
-        return await fetch(`${API_URL}/avisos/indicadores`, {
+        return await fetch(`${API_URL}/faq/indicadores`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',
@@ -39,8 +39,32 @@ export default class AvisosService {
             });
     }
 
-    async deletarAviso(id) {
-        return await fetch(`${API_URL}/avisos/${id}`, {
+    async cadastrarFaq(faq) {
+        return await fetch(`${API_URL}/faq/cadastrar`, {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token
+            },
+            body: JSON.stringify({
+                pergunta: faq.pergunta,
+                resposta: faq.resposta,
+                categoria: faq.categoria
+            })
+        })
+            .then((res) => res.json())
+            .then((d) => {
+                return d;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                throw error;
+            });
+    }
+
+    async deletaFaq(id) {
+        return await fetch(`${API_URL}/faq/${id}`, {
             method: 'DELETE',
             headers: {
                 Accept: 'application/json',
@@ -57,34 +81,18 @@ export default class AvisosService {
             });
     }
 
-    async alteraStatusAviso(id) {
-        return await fetch(`${API_URL}/avisos/alterar-status/${id}`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer ' + token
-            }
-        })
-            .then((res) => res.json())
-            .then((d) => {
-                return d;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                throw error;
-            });
-    }
-
-    async cadastrarCategoria(novaCategoria) {
-        return await fetch(`${API_URL}/avisos/cadastrar-categoria`, {
-            method: 'POST',
+    async editaFaq(faq, id) {
+        return await fetch(`${API_URL}/faq/editar/${id}`, {
+            method: 'PUt',
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + token
             },
             body: JSON.stringify({
-                categoria: novaCategoria
+                pergunta: faq.pergunta,
+                resposta: faq.resposta,
+                categoria: faq.categoria
             })
         })
             .then((res) => res.json())
@@ -97,74 +105,8 @@ export default class AvisosService {
             });
     }
 
-    async buscaCategorias() {
-        return await fetch(`${API_URL}/avisos/busca-categorais`, {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer ' + token
-            }
-        })
-            .then((res) => res.json())
-            .then((d) => {
-                return d;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                throw error;
-            });
-    }
-
-    async cadastrarAviso(aviso) {
-        return await fetch(`${API_URL}/avisos/cadastrar-aviso`, {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token
-            },
-            body: JSON.stringify({
-                titulo: aviso.titulo,
-                categoria_id: aviso.categoria.id,
-                texto: aviso.texto
-            })
-        })
-            .then((res) => res.json())
-            .then((d) => {
-                return d;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                throw error;
-            });
-    }
-
-    async editaAviso(aviso) {
-        return await fetch(`${API_URL}/avisos/editar/${aviso.id}`, {
-            method: 'PUT',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token
-            },
-            body: JSON.stringify({
-                titulo: aviso.titulo,
-                categoria_id: aviso.categoria.id,
-                texto: aviso.texto
-            })
-        })
-            .then((res) => res.json())
-            .then((d) => {
-                return d;
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                throw error;
-            });
-    }
-
-    async buscaAvisosIntranet() {
-        return await fetch(`${API_URL}/avisos/busca-categorais`, {
+    async alteraStatusFaq(id) {
+        return await fetch(`${API_URL}/faq/alterar-status/${id}`, {
             method: 'GET',
             headers: {
                 Accept: 'application/json',

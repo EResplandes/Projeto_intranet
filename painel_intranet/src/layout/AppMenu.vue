@@ -14,7 +14,7 @@ const model = ref([
     },
     {
         label: 'Gestão de FAQ',
-        items: [{ label: 'Perguntas', icon: 'pi pi-fw pi-user', to: '/faq' }]
+        items: [{ label: 'Perguntas', icon: 'pi pi-fw pi-question', to: '/faq' }]
     }
 ]);
 </script>
