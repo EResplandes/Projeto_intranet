@@ -127,4 +127,32 @@ class ColaboradoresController extends Controller
             $query['http_code']
         );
     }
+
+    public function buscaAniversariantes()
+    {
+        $query = $this->colaboradoresService->buscaAniversariantes();
+
+        return response()->json(
+            [
+                'status' => $query['status'],
+                'colaboradores' => $query['colaboradores'] ?? null,
+                'erro' => $query['erro'] ?? null
+            ],
+            $query['http_code']
+        );
+    }
+
+    public function buscaColaboradoresMural()
+    {
+        $query = $this->colaboradoresService->buscaColaboradoresMural();
+
+        return response()->json(
+            [
+                'status' => $query['status'],
+                'colaboradores' => $query['colaboradores'] ?? null,
+                'erro' => $query['erro'] ?? null
+            ],
+            $query['http_code']
+        );
+    }
 }

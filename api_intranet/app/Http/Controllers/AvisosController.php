@@ -105,4 +105,15 @@ class AvisosController extends Controller
             'erro' => $query['erro'] ?? null
         ], $query['http_code']);
     }
+
+    public function buscaAvisosIntranet()
+    {
+        $query = $this->avisosService->buscaAvisosIntranet();
+
+        return response()->json([
+            'status' => $query['status'],
+            'avisos' => $query['avisos'] ?? null,
+            'erro' => $query['erro'] ?? null
+        ], $query['http_code']);
+    }
 }

@@ -243,4 +243,49 @@ class ColaboradoresService
             ];
         }
     }
+
+    public function buscaAniversariantes()
+    {
+        try {
+            $colaboradores = ColaboradoresResource::collection(
+                User::whereMonth('dt_nascimento', date('m'))
+                    ->orderByRaw('DAY(dt_nascimento) ASC')
+                    ->get()
+            );
+
+            return [
+                'status' => true,
+                'colaboradores' => $colaboradores,
+                'http_code' => 200
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'erro' => $e->getMessage(),
+                'http_code' => 500
+            ];
+        }
+    }
+
+    public function buscaColaboradoresMural()
+    {
+        try {
+            $colaboradores = ColaboradoresResource::collection(
+                User::where('ativo', true)
+                    ->get()
+            );
+
+            return [
+                'status' => true,
+                'colaboradores' => $colaboradores,
+                'http_code' => 200
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => false,
+                'erro' => $e->getMessage(),
+                'http_code' => 500
+            ];
+        }
+    }
 }

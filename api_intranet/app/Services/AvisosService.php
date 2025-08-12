@@ -226,4 +226,27 @@ class AvisosService
             ];
         }
     }
+
+    public function buscaAvisosIntranet()
+    {
+        try {
+
+            $avisos = AvisosResource::collection(
+                Avisos::where('ativo', true)->orderBy('created_at', 'desc')->limit(6)->get()
+            );
+
+            return [
+                'status' => 'sucesso',
+                'avisos' => $avisos,
+                'http_code' => 200
+            ];
+        } catch (\Exception $e) {
+            throw $e;
+            return [
+                'status' => 'erro',
+                'erro' => $e,
+                'http_code' => 500
+            ];
+        }
+    }
 }
