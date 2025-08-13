@@ -74,8 +74,8 @@ def parse_folha_de_pagamento_por_funcionario(conteudo_txt):
             
     # Define descontos conhecidos por nome e código para uma categorização mais precisa.
     # Adicionamos palavras-chave e códigos mais específicos para evitar falsos positivos.
-    KNOWN_DISCOUNTS = {"INSS - MENSAL", "IRRF - MENSAL", "PLANO DE SAÚDE", "EMPR CONSIGNADO", "VALE TRANSPORTE"}
-    KNOWN_DISCOUNT_CODES = {"1074", "1082", "603", "604", "605", "329", "271"}
+    KNOWN_DISCOUNTS = {"INSS - MENSAL", "IRRF - MENSAL", "PLANO DE SAÚDE", "EMPR CONSIGNADO", "VALE TRANSPORTE", "PENSÃO AL MENSAL"}
+    KNOWN_DISCOUNT_CODES = {"1074", "1082", "603", "604", "605", "329", "271", "364"}
 
     for i in range(len(inicios) - 1):
         bloco = conteudo_txt[inicios[i]:inicios[i+1]].strip()
