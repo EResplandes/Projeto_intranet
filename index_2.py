@@ -19,16 +19,24 @@ def extrair_blocos_linha(linha):
     representa um bloco encontrado, com sua posição inicial na linha,
     código, descrição, horas/quantidade e valor.
     """
-    # Expressão regular ajustada para ser mais robusta, usando lookahead para delimitar os itens.
+    # Expressão regular para capturar os blocos de informações.
+    # Esta regex procura por um código (1 a 4 dígitos), uma descrição e um valor monetário,
+    # com uma quantidade/horas opcional.
     pad = re.compile(
-        r"(\d{1,4})\s+([A-Z0-9 .ÁÉÍÓÚÂÊÔÃÕÇ/%()+-]+?)\s+(?:(\d{1,3}(?:,\d{2})?)\s+)?(\d{1,3}(?:\.\d{3})*,\d{2})(?=\s+\d{1,4}\s|$)"
+        r"(\d{1,4})\s+([A-Z0-9 .ÁÉÍÓÚÂÊÔÃÕÇ/%()§+-º\d]+?)\s+(?:(\d{1,3}(?:,\d{2})?)\s+)?(\d{1,3}(?:\.\d{3})*,\d{2})"
     )
     itens = []
     for m in pad.finditer(linha):
         codigo = m.group(1).strip()
         descricao = m.group(2).strip()
-        horas_ou_qtd = to_float(m.group(3)) # group 3 é o opcional horas/qtd
-        valor = to_float(m.group(4))       # group 4 é o valor
+        
+        # Ignora itens cuja descrição contenha um dois-pontos,
+        # pois isso indica uma linha de resumo, não um item de folha.
+        if ":" in descricao:
+            continue
+            
+        horas_ou_qtd = to_float(m.group(3))
+        valor = to_float(m.group(4))
 
         itens.append({
             "start": m.start(),
@@ -41,7 +49,7 @@ def extrair_blocos_linha(linha):
 
 # Padrões para identificar linhas de totalização ou rodapé que devem ser ignoradas.
 STOP_PATTERNS = re.compile(
-    r"^(TOTALIZAÇÃO|Totalização|GPS -|IDENTIFICADOR|RIALMA|Folha de Pagamento|COMPETÊNCIA|_{3,})",
+    r"^\s*(TOTALIZAÇÃO|Totalização|GPS -|IDENTIFICADOR|RIALMA|Folha de Pagamento|COMPETÊNCIA|_{3,}|SALÁRIO LÍQUIDO|BASE DO|TOTAL DE)",
     re.I
 )
 
@@ -59,6 +67,15 @@ def parse_folha_de_pagamento_por_funcionario(conteudo_txt):
     # Encontra o início de cada bloco de funcionário.
     inicios = [m.start() for m in re.finditer(r"(?m)^\s*\d{6}[A-ZÁÉÍÓÚÂÊÔÃÕÇ]", conteudo_txt)]
     inicios.append(len(conteudo_txt))  # Adiciona um marcador para o final do último bloco.
+
+    # O ponto de corte entre a coluna de proventos e a de descontos é fixo, em torno do caractere 90.
+    # Isso é mais robusto do que tentar encontrar o cabeçalho "DESCONTOS", que pode variar.
+    split_point = 90
+            
+    # Define descontos conhecidos por nome e código para uma categorização mais precisa.
+    # Adicionamos palavras-chave e códigos mais específicos para evitar falsos positivos.
+    KNOWN_DISCOUNTS = {"INSS - MENSAL", "IRRF - MENSAL", "PLANO DE SAÚDE", "EMPR CONSIGNADO", "VALE TRANSPORTE"}
+    KNOWN_DISCOUNT_CODES = {"1074", "1082", "603", "604", "605", "329", "271"}
 
     for i in range(len(inicios) - 1):
         bloco = conteudo_txt[inicios[i]:inicios[i+1]].strip()
@@ -92,13 +109,11 @@ def parse_folha_de_pagamento_por_funcionario(conteudo_txt):
         proventos = []
         descontos = []
         
-        # O ponto de corte entre a coluna de proventos e a de descontos é por volta do caracter 90.
-        proventos_split_point = 90
-
         # Itera sobre todas as linhas do bloco para extrair dados.
         for l in linhas:
+            # Pula linhas de totalização ou de rodapé.
             if STOP_PATTERNS.search(l):
-                break
+                continue
 
             # Extrai data de admissão e salário base, se disponíveis.
             m_adm = re.search(r"ADMISS[ÃA]O EM\s+(\d{2}/\d{2}/\d{4})", l)
@@ -112,8 +127,19 @@ def parse_folha_de_pagamento_por_funcionario(conteudo_txt):
             # Extrai todos os blocos de itens da linha e os separa em proventos e descontos.
             itens = extrair_blocos_linha(l)
             for item in itens:
-                if item["start"] < proventos_split_point:
-                    # Este item está na coluna de proventos
+                # Prioriza a categorização de descontos conhecidos por nome ou código exato.
+                is_known_discount = any(
+                    known_disc in item['descricao'].upper() for known_disc in KNOWN_DISCOUNTS
+                ) or item['codigo'] in KNOWN_DISCOUNT_CODES
+                
+                if is_known_discount:
+                    descontos.append({
+                        "codigo": item["codigo"],
+                        "descricao": item["descricao"],
+                        "horas_ou_qtd": item["horas_ou_qtd"],
+                        "valor": item["valor"]
+                    })
+                elif item["start"] < split_point:
                     proventos.append({
                         "codigo": item["codigo"],
                         "descricao": item["descricao"],
@@ -121,7 +147,6 @@ def parse_folha_de_pagamento_por_funcionario(conteudo_txt):
                         "valor": item["valor"]
                     })
                 else:
-                    # Este item está na coluna de descontos
                     descontos.append({
                         "codigo": item["codigo"],
                         "descricao": item["descricao"],
