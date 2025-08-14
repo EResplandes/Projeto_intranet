@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AvisosController;
 use App\Http\Controllers\ColaboradoresController;
 use App\Http\Controllers\FaqController;
+use App\Http\Controllers\FolhasController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -49,6 +50,10 @@ Route::prefix('painel')->group(function () {
         Route::get('/indicadores', [FaqController::class, 'buscaIndicadores']);
         Route::get('/alterar-status/{id}', [FaqController::class, 'alteraStatus']);
         Route::delete('/{id}', [FaqController::class, 'deletaFaq']);
+    });
+
+    Route::prefix('folha')->group(function () {
+        Route::post('/importacao-folha', [FolhasController::class, 'importacaoFolha']);
     });
 });
 

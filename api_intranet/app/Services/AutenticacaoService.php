@@ -6,7 +6,7 @@ use App\Http\Resources\UsuarioResource;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\User;
-
+use App\Models\PermissoesUsers;
 
 class AutenticacaoService
 {
@@ -26,13 +26,16 @@ class AutenticacaoService
                 ];
             }
 
+            $permissoes = PermissoesUsers::where('usuario_id', Auth::user()->id)->first();
+
             $usuario = UsuarioResource::collection(User::where('email', $request->email)->get());
 
             return [
                 'token' => $token,
                 'usuario' => $usuario,
                 'http_code' => 200,
-                'status' => true
+                'status' => true,
+                'permissoes' => $permissoes
             ];
         } catch (\Throwable $th) {
             return [

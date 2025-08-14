@@ -23,7 +23,9 @@ class AutenticacaoController extends Controller
             'token' => $query['token'] ?? null,
             'erro' => $query['erro'] ?? null,
             'usuario' => $query['usuario'] ?? null,
+            'permissoes' => $query['permissoes'] ?? null,
             'status' => $query['status'] ?? null
         ], $query['http_code']);
     }
+    
 }
