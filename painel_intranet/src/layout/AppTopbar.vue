@@ -10,6 +10,14 @@ const user = ref({
     name: 'Eduardo Castro',
     avatar: 'http://localhost:8000/storage/imagens/colaboradores/849.446.544-65/w2oq3azguQQUvUt2A6Dn57dOml0MsvViAac8RQK9.jpg'
 });
+
+const logout = ref(() => {
+    localStorage.clear();
+    window.location.href = '/';
+});
+
+const imgUser = localStorage.getItem('imagem');
+const nameUser = localStorage.getItem('usuario');
 </script>
 
 <template>
@@ -32,11 +40,11 @@ const user = ref({
                 <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
             </button>
 
-            <!-- Info do usuário -->
-            <div class="user-info">
-                <img :src="user.avatar" alt="Avatar" class="avatar" />
-                <span class="user-name">{{ user.name }}</span>
-            </div>
+
+            <!-- Logout -->
+            <router-link to="/" class="layout-topbar-action">
+                <i @click="logout()" class="pi pi-sign-out text-white"></i>
+            </router-link>
         </div>
     </div>
 </template>

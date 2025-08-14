@@ -44,11 +44,13 @@ export default {
             try {
                 await this.autenticacaoService.logar(this.form).then((data) => {
                     if (data.token) {
+                        console.log(data);
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('usuario', data.usuario[0].nome);
                         localStorage.setItem('usuario_id', data.usuario[0].id);
                         localStorage.setItem('cargo', data.usuario[0].cargo);
                         localStorage.setItem('imagem', data.usuario[0].imagem);
+                        localStorage.setItem('permissoes', JSON.stringify(data.permissoes));
 
                         if (data.usuario[0].ativo == 1 && data.status) {
                             this.$router.push({ name: 'faq' });
