@@ -54,6 +54,10 @@ Route::prefix('painel')->group(function () {
 
     Route::prefix('folha')->group(function () {
         Route::post('/importacao-folha', [FolhasController::class, 'importacaoFolha']);
+        Route::get('/busca-folhas/{idColaborador}', [FolhasController::class, 'buscaFolhasColaborador']);
+        Route::get('/validacao-folha/{idFolha}', [FolhasController::class, 'validacaoFolha']);
+        Route::get('/painel-colaborador/{idColaborador}', [FolhasController::class, 'painelColaborar']);
+        Route::get('/secullum/{cpf}', [FolhasController::class, 'secullum']);
     });
 });
 

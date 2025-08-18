@@ -33,6 +33,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'admin',
         'cpf',
         'email',
         'cargo',
@@ -41,6 +42,7 @@ class User extends Authenticatable implements JWTSubject
         'dt_admissao',
         'ativo',
         'departamento_id',
+        'matricula'
     ];
 
     /**

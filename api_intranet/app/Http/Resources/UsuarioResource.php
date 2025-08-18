@@ -21,6 +21,7 @@ class UsuarioResource extends JsonResource
             'ativo' => $this->ativo,
             'cpf' => $this->cpf,
             'cargo' => $this->cargo,
+            'admin' => $this->admin,
             'imagem' => $this->imagem,
             'dt_nascimento' => $this->formataData($this->dt_nascimento),
             'dt_admissao' => $this->formataData($this->dt_admissao),

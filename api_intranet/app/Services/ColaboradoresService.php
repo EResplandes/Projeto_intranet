@@ -79,6 +79,7 @@ class ColaboradoresService
                 'email' => $request->email,
                 'ativo' => 1,
                 'departamento_id' => $request->departamento_id,
+                'matricula' => $request->matricula
             ]);
 
             $colaboradores = ColaboradoresResource::collection(User::all());

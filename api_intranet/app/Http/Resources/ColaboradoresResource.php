@@ -17,6 +17,7 @@ class ColaboradoresResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'matricula' => $this->matricula ?? null,
             'nome' => $this->name,
             'cpf' => $this->cpf,
             'cargo' => $this->cargo,

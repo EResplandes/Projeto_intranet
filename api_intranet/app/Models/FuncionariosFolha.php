@@ -16,11 +16,22 @@ class FuncionariosFolha extends Model
         'total_descontos',
         'total_liquido',
         'salario_base',
-        'nome'
+        'nome',
+        'liberado'
     ];
 
     public function folha()
     {
         return $this->belongsTo(FolhasPagamento::class);
+    }
+
+    public function funcionario()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function itens()
+    {
+        return $this->hasMany(ItensFolha::class, 'funcionario_folha_id');
     }
 }
