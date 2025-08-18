@@ -51,11 +51,15 @@ export default {
                         localStorage.setItem('cargo', data.usuario[0].cargo);
                         localStorage.setItem('imagem', data.usuario[0].imagem);
                         localStorage.setItem('permissoes', JSON.stringify(data.permissoes));
+                        localStorage.setItem('cpf', data.usuario[0].cpf);
+                        localStorage.setItem('admin', data.usuario[0].admin);
 
-                        if (data.usuario[0].ativo == 1 && data.status) {
-                            this.$router.push({ name: 'faq' });
+                        if (data.usuario[0].admin === 1 && data.status) {
+                            this.$router.push({ name: 'colaboradores' });
+                        } else if (data.usuario[0].admin === 0 && data.status) {
+                            this.$router.push({ name: 'inicio' });
                         } else {
-                            this.erro.login = true;
+                            this.erro.ativo = true;
                         }
                     } else {
                         this.erro.login = true;

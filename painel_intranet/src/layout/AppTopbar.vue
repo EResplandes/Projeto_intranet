@@ -36,9 +36,9 @@ const nameUser = localStorage.getItem('usuario');
 
         <div class="layout-topbar-actions">
             <!-- Modo claro/escuro -->
-            <button style="color: white" type="button" class="layout-topbar-action" @click="toggleDarkMode">
+            <!-- <button style="color: white" type="button" class="layout-topbar-action" @click="toggleDarkMode">
                 <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
-            </button>
+            </button> -->
 
 
             <!-- Logout -->

@@ -7,64 +7,35 @@ import Avatar from 'primevue/avatar';
 import Button from 'primevue/button';
 import Menu from 'primevue/menu';
 
-// Dados do menu principal
+const admin = localStorage.getItem('admin') === '1'; // Verifica se é admin
+
 const mainMenuItems = ref([
     {
-        label: 'Gestão Intranet',
-        items: [
-            { label: 'Avisos', icon: 'pi pi-fw pi-volume-up', to: '/avisos' },
-            { label: 'Colaboradores', icon: 'pi pi-fw pi-user', to: '/colaboradores' },
-            { label: 'Perguntas Frequentes', icon: 'pi pi-fw pi-question', to: '/faq' }
-        ]
-    },
-    {
         label: 'RH Connect',
-        items: [
-            { label: 'Início', icon: 'pi pi-fw pi-home', to: '/inicio' },
-            { label: 'Banco de Horas', icon: 'pi pi-fw pi-clock', to: '/avisos' },
-            { label: 'Contracheques', icon: 'pi pi-fw pi-credit-card', to: '/faq' },
-            { label: 'Atualização Cadastral', icon: 'pi pi-fw pi-user', to: '/colaboradores' }
-        ]
+        items: [{ label: 'Meu RH', icon: 'pi pi-fw pi-home', to: '/inicio' }]
     },
-    {
-        label: 'Gestão Contracheques',
-        items: [
-            { label: 'Importação', icon: 'pi pi-fw pi-home', to: '/importacao' },
-            { label: 'Validação', icon: 'pi pi-fw pi-home', to: '/inicio' }
-        ]
-    }
+    // Só adiciona se for admin
+    ...(admin
+        ? [
+              {
+                  label: 'Gestão',
+                  items: [
+                      { label: 'Importação', icon: 'pi pi-fw pi-file', to: '/importacao' },
+                      { label: 'Avisos', icon: 'pi pi-fw pi-volume-up', to: '/avisos' },
+                      { label: 'Colaboradores', icon: 'pi pi-fw pi-user', to: '/colaboradores' },
+                      { label: 'Perguntas Frequentes', icon: 'pi pi-fw pi-question', to: '/faq' }
+                  ]
+              }
+          ]
+        : [])
 ]);
 
-const permissoes = localStorage.getItem('permissoes');
 const usuarioNome = localStorage.getItem('usuario');
 const usuarioImagem = localStorage.getItem('imagem');
 const usuarioCargo = localStorage.getItem('cargo');
 
 // Dados e lógica para o menu de perfil do usuário
 const profileMenu = ref();
-const profileItems = ref([
-    {
-        label: 'Meu Perfil',
-        icon: 'pi pi-user-edit',
-        to: '/perfil'
-    },
-    {
-        label: 'Configurações',
-        icon: 'pi pi-cog',
-        to: '/configuracoes'
-    },
-    {
-        separator: true
-    },
-    {
-        label: 'Sair',
-        icon: 'pi pi-sign-out',
-        command: () => {
-            // Coloque aqui a sua lógica de logout
-            console.log('Usuário deslogado.');
-        }
-    }
-]);
 
 const toggleProfileMenu = (event) => {
     profileMenu.value.toggle(event);
@@ -74,8 +45,10 @@ const toggleProfileMenu = (event) => {
 <template>
     <div class="layout-sidebar">
         <!-- Perfil do usuário -->
-        <div class="user-profile">
-            <img :src="'http://localhost:8000/storage/' + usuarioImagem" alt="Avatar" class="avatar" />
+        <div class="user-profile" @click="toggleProfileMenu($event)">
+            <div class="avatar-wrapper">
+                <img :src="'http://localhost:8000/storage/' + usuarioImagem" alt="Avatar" class="avatar" />
+            </div>
 
             <div class="user-info">
                 <span class="user-name">{{ usuarioNome }}</span
@@ -84,13 +57,11 @@ const toggleProfileMenu = (event) => {
             </div>
         </div>
 
-        <!-- Menu de perfil -->
-
         <hr class="menu-divider" />
 
         <!-- Menu principal -->
         <ul class="layout-menu">
-            <template v-for="(item, i) in mainMenuItems" :key="item">
+            <template v-for="(item, i) in mainMenuItems" :key="i">
                 <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
                 <li v-if="item.separator" class="menu-separator"></li>
             </template>
@@ -126,13 +97,30 @@ const toggleProfileMenu = (event) => {
     box-shadow: var(--p-shadow-1);
     margin-bottom: 1.5rem;
     width: 100%;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
 }
 
-.avatar {
+.avatar-wrapper {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    border: 2px solid rgb(0, 0, 0);
+    overflow: hidden;
+    border: 3px solid #4e73df; // cor azul da plataforma RH Connect
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
 }
 
@@ -140,13 +128,14 @@ const toggleProfileMenu = (event) => {
     text-align: center;
 
     .user-name {
-        font-weight: 600;
-        font-size: 1rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #2c3e50;
     }
 
     .user-email {
-        font-size: 0.85rem;
-        color: var(--text-color-secondary);
+        font-size: 0.9rem;
+        color: #7f8c8d;
     }
 }
 

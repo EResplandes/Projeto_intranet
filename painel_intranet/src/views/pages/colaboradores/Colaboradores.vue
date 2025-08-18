@@ -1,6 +1,7 @@
 <script>
 import AvisosService from '../../../service/AvisosService';
 import ColaboradoresService from '../../../service/ColaboradoresService';
+import FolhaService from '../../../service/FolhaService';
 
 export default {
     data() {
@@ -9,21 +10,30 @@ export default {
             colaborador: {},
             aviso: {},
             indicadores: {},
+            folhas: {},
             departamentos: [],
+            expandedRows: [],
             colaboradorSelecionadoId: null,
             novoDepartamento: null,
             botaoEditar: false,
             modalDeletarColaborador: false,
             submitted: false,
             carregandoIndicadores: true,
+            modalFolhasColaborador: false,
             carregandoColaboradores: true,
             modalCadastroColaborador: false,
             modalCadastroDepartamento: false,
             avisosService: new AvisosService(),
-            colaboradoresService: new ColaboradoresService()
+            colaboradoresService: new ColaboradoresService(),
+            folhaService: new FolhaService()
         };
     },
     mounted() {
+        const admin = localStorage.getItem('admin');
+        if (admin === '0') {
+            this.$router.push({ name: 'inicio' });
+        }
+
         // Busca todos colaboradores
         this.colaboradoresService.buscaTodosColaboradores().then((data) => {
             if (data.status) {
@@ -97,6 +107,7 @@ export default {
                 }
             });
         },
+
         alterarStatus(colaborador) {
             this.colaboradoresService.alterarStatusColaborador(colaborador.id).then((data) => {
                 this.mostraMensagemSucesso('Status alterado com sucesso!');
@@ -124,6 +135,21 @@ export default {
             const date = new Date(dateString);
             return date.toLocaleDateString('pt-BR');
         },
+
+        modalFolhas(data) {
+            this.colaborador = data;
+
+            this.buscaFolhaColaborador(data.id);
+
+            this.modalFolhasColaborador = true;
+        },
+
+        buscaFolhaColaborador(id) {
+            this.folhaService.buscaFolhasColaborador(id).then((data) => {
+                this.folhas = data.folhas;
+            });
+        },
+
         mostraMensagemSucesso(mensagem) {
             this.$toast.add({ severity: 'Mensagem do Sistema', summary: 'Info', detail: mensagem, life: 3000 });
         },
@@ -134,18 +160,111 @@ export default {
 
         carregarImagem() {
             this.colaborador.imagem = this.$refs.img.files[0];
+        },
+
+        fecharModalFolhas() {
+            this.modalFolhasColaborador = false;
+            this.colaborador = {};
+            this.folhas = {};
+        },
+
+        validarFolha(data) {
+            this.folhaService.validacaoFolha(data.id).then((data) => {
+                if (data.status) {
+                    this.mostraMensagemSucesso('Folha validada com sucesso!');
+                    this.buscaFolhaColaborador(this.colaborador.id);
+                } else {
+                    this.mostraMensagemErro('Erro ao validar folha!');
+                }
+            });
         }
     }
 };
 </script>
 
 <template>
-    <Toast style="z-index: 99999" />
     <div class="avisos-container">
+        <Toast style="z-index: 99999" />
+
         <!-- Barra de Título e Botão -->
         <div class="flex justify-content-between align-items-center mb-3 justify-center">
             <h1>Gestão de Colaboradores</h1>
         </div>
+
+        <Dialog @hide="fecharModalFolhas" v-model:visible="modalFolhasColaborador" maximizable modal header="📑 Folhas do Colaborador" :style="{ width: '75rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+            <div class="flex flex-col gap-4">
+                <!-- Informações do colaborador -->
+                <div class="p-4 bg-gray-50 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold text-gray-800">{{ colaborador.nome }}</h3>
+                    <p class="text-sm text-gray-500">Matrícula: {{ colaborador.matricula }} | Admissão: {{ colaborador.dt_admissao }}</p>
+                </div>
+
+                <DataTable v-model:expandedRows="expandedRows" :value="folhas" dataKey="id" class="p-datatable-striped p-datatable-sm">
+                    <!-- Coluna expansível -->
+                    <Column expander style="width: 3rem" />
+
+                    <!-- Colunas principais -->
+                    <Column header="Mês/Ano">
+                        <template #body="slotProps"> {{ slotProps.data.folha.mes }}/{{ slotProps.data.folha.ano }} </template>
+                    </Column>
+
+                    <Column header="Salário Base">
+                        <template #body="slotProps"> R$ {{ slotProps.data.salario_base.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} </template>
+                    </Column>
+
+                    <Column header="Total Proventos">
+                        <template #body="slotProps"> R$ {{ slotProps.data.total_proventos.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} </template>
+                    </Column>
+
+                    <Column header="Total Descontos">
+                        <template #body="slotProps"> R$ {{ slotProps.data.total_descontos.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} </template>
+                    </Column>
+
+                    <Column header="Salário Líquido">
+                        <template #body="slotProps"> R$ {{ slotProps.data.total_liquido.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) }} </template>
+                    </Column>
+
+                    <Column header="Status">
+                        <template #body="slotProps">
+                            <Tag :value="slotProps.data.liberado === 1 ? 'Validado' : 'Pendente de Validação'" :severity="slotProps.data.liberado === 1 ? 'success' : 'warn'" />
+                        </template>
+                    </Column>
+
+                    <Column header="Ações" style="width: 8rem">
+                        <template #body="slotProps">
+                            <Button v-if="slotProps.data.liberado === 0" icon="pi pi-check" class="p-button-success mr-2" tooltipOptions="{ position: 'right' }" @click="validarFolha(slotProps.data)" />
+                        </template>
+                    </Column>
+
+                    <!-- Linha expansível -->
+                    <template #expansion="slotProps">
+                        <div class="p-4 bg-gray-50 rounded-lg shadow-sm grid grid-cols-2 gap-6">
+                            <!-- Coluna de Proventos -->
+                            <div>
+                                <h3 class="font-semibold mb-2">Proventos</h3>
+                                <ul class="space-y-1">
+                                    <li v-for="item in slotProps.data.itens.filter((i) => i.tipo === 'Provento')" :key="item.id" class="flex justify-between">
+                                        <span>{{ item.descricao }}</span>
+                                        <span>R$ {{ item.valor.toFixed(2) }}</span>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Coluna de Descontos -->
+                            <div>
+                                <h3 class="font-semibold mb-2">Descontos</h3>
+                                <ul class="space-y-1">
+                                    <li v-for="item in slotProps.data.itens.filter((i) => i.tipo === 'Desconto')" :key="item.id" class="flex justify-between">
+                                        <span>{{ item.descricao }}</span>
+                                        <span>R$ {{ item.valor.toFixed(2) }}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </template>
+                </DataTable>
+            </div>
+        </Dialog>
 
         <Divider />
 
@@ -201,10 +320,7 @@ export default {
                     </template>
 
                     <template>
-                        <!-- <Column field="imagem" header="Imagem do Colaboador" :sortable="true" ">
-                            <template #body="{ data }"> <Image :src="'http://localhost:8000/storage/' + data.imagem" alt="Imagem" width="100" height="100" class="shadow rounded-full borda-redonda" /> </template>
-                        </Column> -->
-
+                        <Column field="matricula" header="Matricula" :sortable="true"></Column>
                         <Column field="nome" header="Nome Completo" :sortable="true"></Column>
                         <Column field="cargo" header="Cargo" :sortable="true"></Column>
                         <Column field="email" header="Email" :sortable="true"></Column>
@@ -218,7 +334,7 @@ export default {
                         </Column>
                         <Column field="dt_nascimento" header="Dt. Nascimento" :sortable="true">
                             <template #body="{ data }">
-                                {{ formatDate(data.dt_nascimento) }}
+                                {{ data.dt_nascimento }}
                             </template>
                         </Column>
                         <Column header="Status">
@@ -226,11 +342,14 @@ export default {
                                 <Tag :value="data.ativo == 1 ? 'Ativo' : 'Desativado'" :severity="data.ativo == 1 ? 'success' : 'danger'" />
                             </template>
                         </Column>
-                        <Column header="Ações" style="width: 150px">
+                        <Column header="Ações" :style="{ minWidth: '240px' }">
                             <template #body="{ data }">
-                                <Button icon="pi pi-pencil" class="p-button-success mr-2" @click="editaColaborador(data)" v-tooltip.top="'Editar'" />
-                                <Button :icon="data.ativo ? 'pi pi-eye-slash' : 'pi pi-eye'" class="p-button-info mr-2" @click="alterarStatus(data)" v-tooltip.top="data.ativo ? 'Desativar' : 'Ativar'" />
-                                <Button icon="pi pi-trash" class="p-button-danger" @click="confirmacaoExclusao(data)" v-tooltip.top="'Excluir'" />
+                                <div class="flex flex-wrap gap-2 justify-start">
+                                    <Button icon="pi pi-pencil" class="p-button-success" @click="editaColaborador(data)" v-tooltip.top="'Editar'" />
+                                    <Button :icon="data.ativo ? 'pi pi-eye-slash' : 'pi pi-eye'" class="p-button-info" @click="alterarStatus(data)" v-tooltip.top="data.ativo ? 'Desativar' : 'Ativar'" />
+                                    <Button icon="pi pi-trash" class="p-button-danger" @click="confirmacaoExclusao(data)" v-tooltip.top="'Excluir'" />
+                                    <Button icon="pi pi-wallet" class="p-button-warning" @click="modalFolhas(data)" v-tooltip.top="'Visualizar Folhas'" />
+                                </div>
                             </template>
                         </Column>
                     </template>
@@ -265,6 +384,12 @@ export default {
                     <Dropdown v-model="colaborador.departamento" :options="departamentos" optionLabel="departamento" placeholder="Selecione" class="w-full" />
                 </div>
 
+                <!-- MATRICULA -->
+                <div class="flex flex-col">
+                    <label class="text-sm text-gray-600 mb-1">Matrícula</label>
+                    <InputText v-model="colaborador.matricula" class="w-full" />
+                </div>
+
                 <!-- CPF -->
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-600 mb-1">CPF</label>
@@ -290,7 +415,7 @@ export default {
                 </div>
 
                 <!-- Cargo -->
-                <div class="flex flex-col md:col-span-2">
+                <div class="flex flex-col md:col-span-1">
                     <label class="text-sm text-gray-600 mb-1">Cargo</label>
                     <InputText v-model="colaborador.cargo" placeholder="Ex: Desenvolvedor Backend" class="w-full" />
                 </div>

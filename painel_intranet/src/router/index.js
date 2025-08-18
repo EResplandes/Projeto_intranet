@@ -9,11 +9,6 @@ const router = createRouter({
             component: AppLayout,
             children: [
                 {
-                    path: '/teste',
-                    name: 'dashboard',
-                    component: () => import('@/views/pages/dashboard/Dashboard.vue')
-                },
-                {
                     path: '/avisos',
                     name: 'avisos',
                     component: () => import('@/views/pages/avisos/Avisos.vue')
@@ -36,7 +31,12 @@ const router = createRouter({
                 {
                     path: '/importacao',
                     name: 'importacao',
-                    component: () => import('@/views/pages/contracheques/Importacao.vue')
+                    component: () => import('@/views/pages/folha/Importacao.vue')
+                },
+                {
+                    path: '/folhas',
+                    name: 'folhas',
+                    component: () => import('@/views/pages/folha/Folhas.vue')
                 },
                 {
                     path: '/uikit/formlayout',
@@ -137,7 +137,7 @@ const router = createRouter({
             component: () => import('@/views/pages/Landing.vue')
         },
         {
-            path: '/pages/notfound',
+            path: '/:pathMatch(.*)*',
             name: 'notfound',
             component: () => import('@/views/pages/NotFound.vue')
         },

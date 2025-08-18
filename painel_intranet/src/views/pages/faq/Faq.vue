@@ -24,6 +24,11 @@ export default {
         };
     },
     mounted() {
+        const admin = localStorage.getItem('admin');
+        if (admin === '0') {
+            this.$router.push({ name: 'inicio' });
+        }
+
         // Metodo para carregar as perguntas
         this.faqService.buscaFaqs().then((data) => {
             if (data.status) this.carregandoFaqs = false;

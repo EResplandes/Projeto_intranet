@@ -124,6 +124,7 @@ export default class ColaboradoresService {
         formData.append('dt_nascimento', this.formatarData(colaborador?.dt_nascimento) ?? null);
         formData.append('cargo', colaborador?.cargo ?? null);
         formData.append('imagem', colaborador?.imagem ?? null);
+        formData.append('matricula', colaborador?.matricula ?? null);
 
         return fetch(`${API_URL}/colaboradores/cadastrar`, {
             method: 'POST',

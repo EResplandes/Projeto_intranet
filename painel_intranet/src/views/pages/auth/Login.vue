@@ -14,7 +14,6 @@ export default {
     },
     data() {
         return {
-            logo: logo,
             form: {
                 email: '',
                 senha: ''
@@ -45,17 +44,17 @@ export default {
                     if (data.token) {
                         localStorage.setItem('token', data.token);
                         localStorage.setItem('usuario', JSON.stringify(data.user));
-                        const solicitante = data.user.tipo_usuario;
+                        console.log(data);
 
                         if (data.user.ativo == 0) {
                             return (this.erro.ativo = true);
                         }
 
-                        if (solicitante != 'solicitante') {
-                            this.$router.push({ name: 'atendimento-chamados' });
-                        } else {
-                            this.$router.push({ name: 'meus-chamados' });
-                        }
+                        // if (data.user.admin) {
+                        //     this.$router.push({ name: 'colaboradores' });
+                        // } else {
+                        //     this.$router.push({ name: 'inicio' });
+                        // }
                     } else {
                         this.erro.login = true;
                     }

@@ -24,6 +24,11 @@ export default {
         };
     },
     mounted() {
+        const admin = localStorage.getItem('admin');
+        if (admin === '0') {
+            this.$router.push({ name: 'inicio' });
+        }
+
         // Buscando todos os avisos cadastrados no sistema
         this.avisosService.buscaAvisos().then((data) => {
             this.avisos = data.avisos;
